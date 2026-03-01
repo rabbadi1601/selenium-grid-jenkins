@@ -8,7 +8,7 @@ pipeline {
 
     tools {
         maven 'Maven-Local-3.9.12'
-        allure 'Allure'
+        allure 'Allure-2.37.0'
     }
 
     triggers {
