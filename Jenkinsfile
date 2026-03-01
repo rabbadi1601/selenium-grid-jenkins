@@ -2,10 +2,13 @@ pipeline {
     agent any
 
     environment {
-        MAVEN_HOME = 'C:\\ProgramData\\chocolatey\\lib\\maven\\apache-maven-3.9.12'
+      
         ALLURE_RESULTS = 'target\\allure-results'
     }
-
+     tools {
+        // Use the Maven tool configured in Jenkins
+        maven 'Maven-Local-3.9.12'
+    }
     // Trigger on Git push + every 60 minutes
     triggers {
         pollSCM('H * * * *')   // Git polling
