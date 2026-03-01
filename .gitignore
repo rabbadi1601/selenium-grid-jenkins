@@ -16,3 +16,7 @@ target/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Allure results & report folders
+/target/allure-results/
+/target/allure-report/
