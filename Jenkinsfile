@@ -43,12 +43,12 @@ pipeline {
             }
         }
 
-        stage('Generate Allure Report') {
-            steps {
-                echo "Generating Allure Report..."
-                allure includeProperties: false, jdk: '', results: [[path: "%ALLURE_RESULTS%"]]
-            }
-        }
+       stage('Generate Allure Report') {
+    steps {
+        echo "Generating Allure Report..."
+        allure includeProperties: false, jdk: '', results: [[path: "%ALLURE_RESULTS%"]], reportBuildPolicy: 'ALWAYS'
+    }
+}
     }
 
     post {
