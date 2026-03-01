@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+
+    environment {
+        ALLURE_RESULTS = 'target/allure-results'
+        ALLURE_REPORT  = 'target/allure-report'
+    }
+
+    tools {
+        maven 'Maven-Local-3.9.12'
+        allure 'Allure'
+    }
+
+    triggers {
+        pollSCM('H/5 * * * *') // Git polling every 5 mins
+        cron('H/15 * * * *')   // Optional: run pipeline every 15 mins
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "🔄 Checking out code from GitHub..."
+                git branch: 'main', url: 'https://github.com/rabbadi1601/selenium-grid-jenkins.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "⚙️ Building project with Maven..."
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Prepare Allure Results') {
+            steps {
+                echo "📂 Ensuring Allure results folder exists..."
+                sh "mkdir -p ${ALLURE_RESULTS}"
+            }
+        }
+
+        stage('Run Tests on Selenium Grid') {
+            steps {
+                echo "🚀 Running TestNG tests on Selenium Grid..."
+                // Optional Edge: skip if node not available
+                sh '''
+                    if grep -q "edge" src/test/resources/config.properties; then
+                        echo "Edge node defined, attempting Edge tests..."
+                    else
+                        echo "Edge node not defined, skipping Edge tests."
+                    fi
+                    mvn test -DsuiteXmlFile=testng.xml
+                '''
+            }
+        }
+
+        stage('Generate Allure HTML Report') {
+            steps {
+                echo "📊 Generating Allure HTML report..."
+                sh "allure generate ${ALLURE_RESULTS} --clean -o ${ALLURE_REPORT}"
+            }
+        }
+
+        stage('Publish Reports') {
+            steps {
+                echo "📁 Archiving Allure HTML report and test results..."
+                archiveArtifacts artifacts: "${ALLURE_REPORT}/**", fingerprint: true
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Allure Jenkins Plugin Report') {
+            steps {
+                echo "🖥 Publishing Allure report in Jenkins UI..."
+                allure includeProperties: false, jdk: '', results: [[path: "${ALLURE_RESULTS}"]], reportBuildPolicy: 'ALWAYS'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully. Allure report is ready."
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs and Allure report."
+        }
+    }
+}

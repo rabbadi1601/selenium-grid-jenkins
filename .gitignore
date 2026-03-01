@@ -20,3 +20,8 @@ Thumbs.db
 # Allure results & report folders
 /target/allure-results/
 /target/allure-report/
+
+# Local Allure CLI
+/.allure/
+
+test-output/

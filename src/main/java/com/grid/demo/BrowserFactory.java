@@ -14,17 +14,17 @@ public class BrowserFactory {
         if (browser.equalsIgnoreCase("chrome")) {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--start-maximized");
-            return new RemoteWebDriver(new URL("http://localhost:4444"), options);
+            return new RemoteWebDriver(new URL(ConfigReader.get("grid.url")), options);
         }
 
         else if (browser.equalsIgnoreCase("firefox")) {
             FirefoxOptions options = new FirefoxOptions();
-            return new RemoteWebDriver(new URL("http://localhost:4444"), options);
+            return new RemoteWebDriver(new URL(ConfigReader.get("grid.url")), options);
         }
 
         else if (browser.equalsIgnoreCase("edge")) {
             EdgeOptions options = new EdgeOptions();
-            return new RemoteWebDriver(new URL("http://localhost:4444"), options);
+            return new RemoteWebDriver(new URL(ConfigReader.get("grid.url")), options);
         }
 
         else {
